@@ -11,7 +11,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.IBinder;
-import android.support.v4.content.LocalBroadcastManager;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import android.util.Log;
 import android.util.Base64;
 
@@ -79,8 +79,8 @@ public class UnityWifiDirect {
         Log.i(TAG, "discovery stopped");
     }
     public static void connectToService (String address) {
+        Log.i(TAG, "initiating connection to "+ address);
         wifiDirectHandler.initiateConnectToService(wifiDirectHandler.getDnsSdServiceMap().get(address));
-        Log.i(TAG, "initiating connection to "+address);
     }
     public static void sendMessage (String msg) {
         try {
@@ -117,11 +117,15 @@ public class UnityWifiDirect {
     private static BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive (Context context, Intent intent) {
+            StringBuilder encoded = new StringBuilder();
+
             switch(intent.getAction()) {
                 case WifiDirectHandler.Action.DNS_SD_SERVICE_AVAILABLE:
                     String serviceAddress = intent.getStringExtra(WifiDirectHandler.SERVICE_MAP_KEY);
-                    Log.i(TAG, "device found @ address "+serviceAddress);
-                    UnityPlayer.UnitySendMessage(gameObject, "onServiceFound", serviceAddress);
+                    String serviceName = intent.getStringExtra(WifiDirectHandler.SERVICE_NAME);
+                    Log.i(TAG, "device found @ address "+ serviceAddress + " with service name " + serviceName);
+                    encoded.append(serviceAddress + "_" + serviceName);
+                    UnityPlayer.UnitySendMessage(gameObject, "onServiceFound", encoded.toString());
                     break;
                 case WifiDirectHandler.Action.DNS_SD_TXT_RECORD_AVAILABLE:
                     String txtAddress = intent.getStringExtra(WifiDirectHandler.TXT_MAP_KEY);
@@ -131,7 +135,6 @@ public class UnityWifiDirect {
                     addr_key1?val1_key2?val2_
                     addr, keys, and values are all base64 so you can put any string through
                      */
-                    StringBuilder encoded = new StringBuilder();
                     try {
                         encoded.append(Base64.encodeToString(txtAddress.getBytes("UTF-16"), Base64.DEFAULT) + "_");
                         for(Map.Entry<String, String> entry : recordMap.entrySet()) {
