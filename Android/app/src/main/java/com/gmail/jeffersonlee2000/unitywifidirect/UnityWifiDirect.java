@@ -45,9 +45,9 @@ public class UnityWifiDirect {
         filter.addAction(WifiDirectHandler.Action.SERVICE_CONNECTED);
         filter.addAction(WifiDirectHandler.Action.MESSAGE_RECEIVED);
         filter.addAction(WifiDirectHandler.Action.DEVICE_CHANGED);
-        filter.addAction(WifiDirectHandler.Action.WIFI_STATE_CHANGED);
         filter.addAction(WifiDirectHandler.Action.DNS_SD_TXT_RECORD_AVAILABLE);
         filter.addAction(WifiDirectHandler.Action.DNS_SD_SERVICE_AVAILABLE);
+        filter.addAction(WifiDirectHandler.Action.COMMUNICATION_DISCONNECTED);
         LocalBroadcastManager.getInstance(unityActivity).registerReceiver(broadcastReceiver, filter);
         Log.i(TAG, "Broadcast receiver registered");
         //bind service
@@ -88,6 +88,14 @@ public class UnityWifiDirect {
         }
         catch (Exception e) { //because there's gonna be that one fool who doesn't support UTF-16
 
+        }
+    }
+    public static void cancelConnect() {
+        try {
+            wifiDirectHandler.cancelConnect();
+        }
+        catch (Exception e) {
+            Log.e(TAG, "Failed to cancel connection.");
         }
     }
     //anonymous classes
@@ -157,6 +165,12 @@ public class UnityWifiDirect {
                         String msg = new String(intent.getByteArrayExtra(WifiDirectHandler.MESSAGE_KEY), "UTF-16");
                         Log.i(TAG, "Message received: "+msg);
                         UnityPlayer.UnitySendMessage(gameObject, "onMessage", msg);
+                    } catch (Exception e) {}
+                    break;
+                case WifiDirectHandler.Action.COMMUNICATION_DISCONNECTED:
+                    try {
+                        Log.i(TAG, "Communication with peer disconnected.");
+                        UnityPlayer.UnitySendMessage(gameObject, "onCommunicationFailure", "");
                     } catch (Exception e) {}
                     break;
                 default:
