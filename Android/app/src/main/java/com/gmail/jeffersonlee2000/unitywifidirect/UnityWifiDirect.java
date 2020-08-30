@@ -153,7 +153,6 @@ public class UnityWifiDirect {
                         e.printStackTrace();
                     }
                     String result = encoded.toString();
-                    Log.i(TAG, "device found with text record, formatted string: "+result);
                     UnityPlayer.UnitySendMessage(gameObject, "onUglyTxtRecord", result);
                     break;
                 case WifiDirectHandler.Action.SERVICE_CONNECTED:
@@ -163,7 +162,6 @@ public class UnityWifiDirect {
                 case WifiDirectHandler.Action.MESSAGE_RECEIVED:
                     try {
                         String msg = new String(intent.getByteArrayExtra(WifiDirectHandler.MESSAGE_KEY), "UTF-16");
-                        Log.i(TAG, "Message received: "+msg);
                         UnityPlayer.UnitySendMessage(gameObject, "onMessage", msg);
                     } catch (Exception e) {}
                     break;
