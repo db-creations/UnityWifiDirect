@@ -70,6 +70,10 @@ public class UnityWifiDirect {
         Log.i(TAG, "broadcasting service: "+serviceName);
         wifiDirectHandler.addLocalService(serviceName, records);
     }
+    public static void removeService() {
+        Log.i(TAG, "Removing local service");
+        wifiDirectHandler.removeService();
+    }
     public static void discoverServices () {
         wifiDirectHandler.continuouslyDiscoverServices();
         Log.i(TAG, "discovering services");
